@@ -1,6 +1,7 @@
 const int BUS_PIN = 10;
 const int PULLDOWN_TIME = 3; //us
 const int NUM_OF_SENSORS = 5;
+const int TEMP_CONVERT_TIME = 750; //us
 
 //comands (transmit with least significant bit first!!!):
 const boolean SEARCH_ROM[8] = {0,0,0,0,1,1,1,1}; //0xF0
@@ -83,7 +84,7 @@ void getTempSingle(int pBusPin) {
   delayMicroseconds(100);
   writeCommand(BUS_PIN, SKIP_ROM);
   writeCommand(BUS_PIN, CONVERT_T);
-  delay(1000); //wait for temperature conversion to finish
+  delay(TEMP_CONVERT_TIME); //wait for temperature conversion to finish
   reset(BUS_PIN);
   delayMicroseconds(100);
   writeCommand(BUS_PIN, SKIP_ROM);
@@ -100,7 +101,7 @@ void getTemp(int pBusPin, int indexSensor) {
   writeCommand(pBusPin, MATCH_ROM);
   writeData(pBusPin, 64, ROM_CODES[indexSensor]);
   writeCommand(BUS_PIN, CONVERT_T);
-  delay(1000); //wait for temperature conversion to finish
+  delay(TEMP_CONVERT_TIME); //wait for temperature conversion to finish
   reset(BUS_PIN);
   delayMicroseconds(100);
   writeCommand(pBusPin, MATCH_ROM);
