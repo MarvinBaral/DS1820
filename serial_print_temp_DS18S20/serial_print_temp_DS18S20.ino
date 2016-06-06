@@ -23,7 +23,7 @@ const boolean ROM_CODES[NUM_OF_SENSORS][64] = {
 
 //timing
 const int PULLDOWN_TIME = 3; //us, min 1 us
-const int TEMP_CONVERT_TIME = 1; //ms
+const int TEMP_CONVERT_TIME = 750; //ms
 const int RECOVERY_BETWEEN_SLOTS = 3; //us min 1 us
 const int READ_SAMPLE_TIME = 15; //us
 const signed int  READ_OFFSET = -5; //us
@@ -81,6 +81,7 @@ boolean reset(int pBusPin) { //can even be executed multiple times directly afte
 }
 
 void writeBus(int pBusPin, boolean logicLevel) {
+  delayMicroseconds(RECOVERY_BETWEEN_SLOTS);
   pinMode(pBusPin, OUTPUT);
   digitalWrite(pBusPin, LOW);
   delayMicroseconds(PULLDOWN_TIME);
@@ -91,17 +92,16 @@ void writeBus(int pBusPin, boolean logicLevel) {
   if(!logicLevel){
     pinMode(pBusPin, INPUT_PULLUP);
   }
-  delayMicroseconds(RECOVERY_BETWEEN_SLOTS);
 }
 
 boolean readBus(int pBusPin) {
+  delayMicroseconds(RECOVERY_BETWEEN_SLOTS);
   pinMode(pBusPin, OUTPUT);
   digitalWrite(pBusPin, LOW);
   delayMicroseconds(PULLDOWN_TIME);
   pinMode(pBusPin, INPUT_PULLUP);
   delayMicroseconds(READ_SAMPLE_TIME - PULLDOWN_TIME + READ_OFFSET);
   boolean input = digitalRead(pBusPin);
-  delayMicroseconds(RECOVERY_BETWEEN_SLOTS);
   delayMicroseconds(MIN_SLOT_SIZE - READ_SAMPLE_TIME -RECOVERY_BETWEEN_SLOTS); //wait for read time slot to be over (minimum 60us)
   return input;
 }
