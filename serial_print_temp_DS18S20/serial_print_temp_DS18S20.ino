@@ -53,8 +53,6 @@ void loop() {
   getTemp(BUS_PIN, 3);
   getTemp(BUS_PIN, 4);
   //printROMSingle(BUS_PIN, true);
-  Serial.println();
-  delay(1000);
 }
 
 boolean reset(int pBusPin) { //can even be executed multiple times directly after each other without problems
