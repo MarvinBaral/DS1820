@@ -1,7 +1,5 @@
 const int BUS_PIN = 10;
-const int PULLDOWN_TIME = 3; //us
 const int NUM_OF_SENSORS = 5;
-const int TEMP_CONVERT_TIME = 750; //us
 
 //comands (transmit with least significant bit first!!!):
 const boolean SEARCH_ROM[8] = {0,0,0,0,1,1,1,1}; //0xF0
@@ -22,6 +20,16 @@ const boolean ROM_CODES[NUM_OF_SENSORS][64] = {
   {0,0,0,0,1,0,0,0,1,1,0,0,1,1,1,0,0,1,0,0,1,1,0,1,0,1,0,1,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,0},
   {0,0,0,0,1,0,0,0,1,1,0,0,0,1,1,1,0,1,1,1,0,1,1,0,0,1,0,1,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,1,0,1}
 };
+
+//timing
+const int PULLDOWN_TIME = 3; //us
+const int TEMP_CONVERT_TIME = 1; //ms
+
+//reset only
+const int MIN_TIME_RESET_PULSE = 480; //us
+const int MAX_TIME_PRESENCE_PULSE = 240; //us
+const int MIN_TIME_MASTER_RESET_SAMPLING = 480; //us
+const int MAX_DELAY_SENSOR = 60; //us
 
 boolean input = 0;
 unsigned long startMicros = 0;
@@ -44,6 +52,54 @@ void loop() {
   delay(1000);
 }
 
+boolean reset(int pBusPin) { //can even be executed multiple times directly after each other without problems
+  pinMode(pBusPin, OUTPUT);
+  digitalWrite(pBusPin, 0);
+  delayMicroseconds(MIN_TIME_RESET_PULSE);
+  
+  pinMode(pBusPin, INPUT_PULLUP);
+  startMicros = micros();
+  delayMicroseconds(MAX_DELAY_SENSOR); //In this time there is a peak when master releases bus and after this sensor pulls bus down
+  do{
+    input = digitalRead(pBusPin);
+    timeMicros = micros() - startMicros;
+  } while(!input || timeMicros > (MIN_TIME_MASTER_RESET_SAMPLING + 50));
+  
+  bool success = (timeMicros > MAX_DELAY_SENSOR && timeMicros < MAX_TIME_PRESENCE_PULSE);
+  if (!success) {
+    Serial.println("No sensor responding to ping.");
+    Serial.print("Time between master releasing bus and sensor releasing bus: ");
+    Serial.print(timeMicros);
+    Serial.println(" us");
+  }
+  return success;
+}
+
+void writeBus(int pBusPin, boolean logicLevel) {
+  pinMode(pBusPin, OUTPUT);
+  digitalWrite(pBusPin, LOW);
+  delayMicroseconds(PULLDOWN_TIME);
+  if(logicLevel){
+    pinMode(pBusPin, INPUT_PULLUP);
+  }
+  delayMicroseconds(60);
+  if(!logicLevel){
+    pinMode(pBusPin, INPUT_PULLUP);
+  }
+  delayMicroseconds(1);
+}
+
+boolean readBus(int pBusPin) {
+  pinMode(pBusPin, OUTPUT);
+  digitalWrite(pBusPin, LOW);
+  delayMicroseconds(PULLDOWN_TIME);
+  pinMode(pBusPin, INPUT_PULLUP);
+  delayMicroseconds(15 - PULLDOWN_TIME - 5);
+  boolean input = digitalRead(pBusPin);
+  delayMicroseconds(50); //wait for read time slot to be over (minimum 60us)
+
+  return input;
+}
 void getROMSingle(int pBusPin) {
   reset(BUS_PIN);
   delayMicroseconds(100);
@@ -128,49 +184,4 @@ float convertArrayToTemp(boolean array[][72], int indexSensor) {
   return temp;
 }
 
-boolean reset(int pBusPin) { //can even be executed multiple times directly after each other without problems
-  pinMode(pBusPin, OUTPUT);
-  digitalWrite(pBusPin, 0);
-  delayMicroseconds(400);
-  
-  pinMode(pBusPin, INPUT_PULLUP);
-  startMicros = micros();
-  delayMicroseconds(30);
-  do{
-    input = digitalRead(pBusPin);
-    timeMicros = micros() - startMicros;
-  } while(!input || timeMicros > 500);
-  
-  bool success = (timeMicros > 130 && timeMicros < 170);
-  if (!success) {
-    Serial.println("no sensor responding to ping");
-  }
-  return success;
-}
-
-void writeBus(int pBusPin, boolean logicLevel) {
-  pinMode(pBusPin, OUTPUT);
-  digitalWrite(pBusPin, LOW);
-  delayMicroseconds(PULLDOWN_TIME);
-  if(logicLevel){
-    pinMode(pBusPin, INPUT_PULLUP);
-  }
-  delayMicroseconds(60);
-  if(!logicLevel){
-    pinMode(pBusPin, INPUT_PULLUP);
-  }
-  delayMicroseconds(1);
-}
-
-boolean readBus(int pBusPin) {
-  pinMode(pBusPin, OUTPUT);
-  digitalWrite(pBusPin, LOW);
-  delayMicroseconds(PULLDOWN_TIME);
-  pinMode(pBusPin, INPUT_PULLUP);
-  delayMicroseconds(15 - PULLDOWN_TIME - 5);
-  boolean input = digitalRead(pBusPin);
-  delayMicroseconds(50); //wait for read time slot to be over (minimum 60us)
-
-  return input;
-}
 
