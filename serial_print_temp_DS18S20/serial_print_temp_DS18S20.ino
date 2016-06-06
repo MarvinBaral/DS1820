@@ -77,7 +77,6 @@ boolean reset(int pBusPin) { //can even be executed multiple times directly afte
     Serial.print(timeMicros);
     Serial.println(" us");
   }
-  Serial.print(timeMicros);
   return success;
 }
 
