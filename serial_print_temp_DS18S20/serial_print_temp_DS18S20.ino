@@ -29,7 +29,7 @@ const int TEMP_CONVERT_TIME = 1; //ms
 const int MIN_TIME_RESET_PULSE = 480; //us
 const int MAX_TIME_PRESENCE_PULSE = 240; //us
 const int MIN_TIME_MASTER_RESET_SAMPLING = 480; //us
-const int MAX_DELAY_SENSOR = 60; //us
+const int RESET_MAX_DELAY_SENSOR = 60; //us
 
 boolean input = 0;
 unsigned long startMicros = 0;
@@ -59,19 +59,20 @@ boolean reset(int pBusPin) { //can even be executed multiple times directly afte
   
   pinMode(pBusPin, INPUT_PULLUP);
   startMicros = micros();
-  delayMicroseconds(MAX_DELAY_SENSOR); //In this time there is a peak when master releases bus and after this sensor pulls bus down
+  delayMicroseconds(RESET_MAX_DELAY_SENSOR); //In this time there is a peak when master releases bus and after this sensor pulls bus down
   do{
     input = digitalRead(pBusPin);
     timeMicros = micros() - startMicros;
-  } while(!input || timeMicros > (MIN_TIME_MASTER_RESET_SAMPLING + 50));
+  } while(!input || timeMicros > MIN_TIME_MASTER_RESET_SAMPLING);
   
-  bool success = (timeMicros > MAX_DELAY_SENSOR && timeMicros < MAX_TIME_PRESENCE_PULSE);
+  bool success = (timeMicros > RESET_MAX_DELAY_SENSOR && timeMicros < MIN_TIME_MASTER_RESET_SAMPLING); //MAX_TIME_PRESENCE_PULSE * 1.1
   if (!success) {
     Serial.println("No sensor responding to ping.");
     Serial.print("Time between master releasing bus and sensor releasing bus: ");
     Serial.print(timeMicros);
     Serial.println(" us");
   }
+  Serial.print(timeMicros);
   return success;
 }
 
