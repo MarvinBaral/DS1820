@@ -46,6 +46,8 @@ const int MAX_TIME_PRESENCE_PULSE = 240; //us
 const int MIN_TIME_MASTER_RESET_SAMPLING = 480; //us
 const int RESET_MAX_DELAY_SENSOR = 60; //us
 
+const int READ_BYTES_FOR_TEMP = 16;
+
 boolean input = 0;
 unsigned long startMicros = 0;
 unsigned long timeMicros = 0;
@@ -161,7 +163,7 @@ void getTempSingle(int pBusPin) {
   writeCommand(BUS_PIN, SKIP_ROM);
   writeCommand(BUS_PIN, READ_SCRATCHPAD);
   delayMicroseconds(5);
-  readData(BUS_PIN, 8, 0);
+  readData(BUS_PIN, READ_BYTES_FOR_TEMP, 0);
   reset(BUS_PIN); //suppress sending of further unnecessary information
   Serial.println(convertArrayToTemp(data));
 }
@@ -179,7 +181,7 @@ void getTemp(int pBusPin, int indexSensor) {
   writeData(pBusPin, 64, ROM_CODES[indexSensor]);
   writeCommand(BUS_PIN, READ_SCRATCHPAD);
   delayMicroseconds(5);
-  readData(BUS_PIN, 8, indexSensor);
+  readData(BUS_PIN, READ_BYTES_FOR_TEMP, indexSensor);
   reset(BUS_PIN); //suppress sending of further unnecessary information
   float temp = convertArrayToTemp(data);
   Serial.print(indexSensor);
