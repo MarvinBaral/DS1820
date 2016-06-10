@@ -1,5 +1,5 @@
 const int BUS_PIN = 10;
-const int NUM_OF_SENSORS = 5;
+const int NUM_SENSORS = 5;
 
 //comands (transmit with least significant bit first!!!):
 const boolean SEARCH_ROM[8] = {0,0,0,0,1,1,1,1}; //0xF0
@@ -13,7 +13,7 @@ const boolean READ_SCRATCHPAD[8] = {0,1,1,1,1,1,0,1}; //0xBE
 const boolean COPY_SCRATCHPAD[8] = {0,0,0,1,0,0,1,0}; //0x48
 const boolean RECALL_E[8] = {0,0,0,1,1,1,0,1}; //0xB8
 const boolean READ_POWER[8] = {0,0,1,0,1,1,0,1}; //0xB4
-const boolean ROM_CODES[NUM_OF_SENSORS][64] = {
+const boolean ROM_CODES[NUM_SENSORS][64] = {
   {0,0,0,0,1,0,0,0,1,1,0,0,1,1,1,0,1,1,0,1,0,1,1,1,0,1,0,1,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,1,1,0,0,0},
   {0,0,0,0,1,0,0,0,1,0,0,0,0,1,1,0,0,1,0,1,0,0,0,1,0,1,0,1,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1},
   {0,0,0,0,1,0,0,0,1,0,0,1,1,1,0,1,1,1,0,1,0,1,1,1,0,1,0,1,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,1,0,0,1,0},
@@ -39,7 +39,7 @@ const int RESET_MAX_DELAY_SENSOR = 60; //us
 boolean input = 0;
 unsigned long startMicros = 0;
 unsigned long timeMicros = 0;
-boolean data[NUM_OF_SENSORS][72]; //array where every set of read data is saved
+boolean data[NUM_SENSORS][72]; //array where every set of read data is saved
 
 void setup() {
   Serial.begin(9600);
@@ -47,11 +47,9 @@ void setup() {
 }
 
 void loop() {
-  getTemp(BUS_PIN, 0);
-  getTemp(BUS_PIN, 1);
-  getTemp(BUS_PIN, 2);
-  getTemp(BUS_PIN, 3);
-  getTemp(BUS_PIN, 4);
+  for (int i = 0; i < NUM_SENSORS; i++) {
+    getTemp(BUS_PIN, i);
+  }
   //printROMSingle(BUS_PIN, true);
 }
 
