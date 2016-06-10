@@ -122,7 +122,7 @@ void getROMSingle(int pBusPin) {
   delayMicroseconds(100);
   writeCommand(BUS_PIN, READ_ROM);
   delayMicroseconds(5); //!!!!!!!!!!!!!!!!!!!!!!!!
-  readData(BUS_PIN, 64, 0);
+  readData(BUS_PIN, 64);
 }
 
 void printROMSingle(int pBusPin, boolean toPasteIntoROMCodes_h) {
@@ -146,7 +146,7 @@ void writeData(int pBusPin, const int numBits, const boolean pData[]) {
   }  
 }
 
-void readData(int pBusPin, const int numBits, int indexSensor) {
+void readData(int pBusPin, const int numBits) {
   for(int q = 0; q < numBits; q++) {
     data[q] = readBus(pBusPin);
   }
@@ -163,7 +163,7 @@ void getTempSingle(int pBusPin) {
   writeCommand(BUS_PIN, SKIP_ROM);
   writeCommand(BUS_PIN, READ_SCRATCHPAD);
   delayMicroseconds(5);
-  readData(BUS_PIN, READ_BYTES_FOR_TEMP, 0);
+  readData(BUS_PIN, READ_BYTES_FOR_TEMP);
   reset(BUS_PIN); //suppress sending of further unnecessary information
   Serial.println(convertArrayToTemp(data));
 }
@@ -181,7 +181,7 @@ void getTemp(int pBusPin, int indexSensor) {
   writeData(pBusPin, 64, ROM_CODES[indexSensor]);
   writeCommand(BUS_PIN, READ_SCRATCHPAD);
   delayMicroseconds(5);
-  readData(BUS_PIN, READ_BYTES_FOR_TEMP, indexSensor);
+  readData(BUS_PIN, READ_BYTES_FOR_TEMP);
   reset(BUS_PIN); //suppress sending of further unnecessary information
   float temp = convertArrayToTemp(data);
   Serial.print(indexSensor);
