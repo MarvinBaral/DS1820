@@ -40,7 +40,7 @@ const int RESET_MAX_DELAY_SENSOR = 60; //us
 boolean input = 0;
 unsigned long startMicros = 0;
 unsigned long timeMicros = 0;
-boolean data[NUM_SENSORS][72]; //array where every set of read data is saved
+boolean data[72]; //array where every set of read data is saved
 
 void setup() {
   Serial.begin(9600);
@@ -113,7 +113,7 @@ void getROMSingle(int pBusPin) {
 void printROMSingle(int pBusPin, boolean toPasteIntoROMCodes_h) {
   getROMSingle(pBusPin);
   for (int i = 0; i < 64; i++) {
-    Serial.print(data[0][i]);
+    Serial.print(data[i]);
     if (toPasteIntoROMCodes_h) {
       Serial.print(",");
     }
@@ -133,7 +133,7 @@ void writeData(int pBusPin, const int numBits, const boolean pData[]) {
 
 void readData(int pBusPin, const int numBits, int indexSensor) {
   for(int q = 0; q < numBits; q++) {
-    data[indexSensor][q] = readBus(pBusPin);
+    data[q] = readBus(pBusPin);
   }
 }
 
@@ -150,7 +150,7 @@ void getTempSingle(int pBusPin) {
   delayMicroseconds(5);
   readData(BUS_PIN, 8, 0);
   reset(BUS_PIN); //suppress sending of further unnecessary information
-  Serial.println(convertArrayToTemp(data, 0));
+  Serial.println(convertArrayToTemp(data));
 }
 
 void getTemp(int pBusPin, int indexSensor) {
@@ -168,7 +168,7 @@ void getTemp(int pBusPin, int indexSensor) {
   delayMicroseconds(5);
   readData(BUS_PIN, 8, indexSensor);
   reset(BUS_PIN); //suppress sending of further unnecessary information
-  float temp = convertArrayToTemp(data, indexSensor);
+  float temp = convertArrayToTemp(data);
   Serial.print(indexSensor);
   Serial.print(": ");
   if (temp < 125) { //default value if only the high bus is read instead of sensor-data
@@ -178,10 +178,10 @@ void getTemp(int pBusPin, int indexSensor) {
   }
 }
 
-float convertArrayToTemp(boolean array[][72], int indexSensor) {
+float convertArrayToTemp(boolean array[72]) {
   float temp = 0;
   for (int i = 0; i < 8; i++) {
-    temp += array[indexSensor][i] * pow(2, (i - 1));    
+    temp += array[i] * pow(2, (i - 1));    
   }
   return temp;
 }
