@@ -72,7 +72,7 @@ boolean reset(int pBusPin) { //can even be executed multiple times directly afte
   digitalWrite(pBusPin, 0);
   delayMicroseconds(MIN_TIME_RESET_PULSE);
   
-  pinMode(pBusPin, INPUT_PULLUP);
+  pinMode(pBusPin, INPUT);
   startMicros = micros();
   delayMicroseconds(RESET_MAX_DELAY_SENSOR); //In this time there is a peak when master releases bus and after this sensor pulls bus down
   do{
@@ -96,11 +96,11 @@ void writeBus(int pBusPin, boolean logicLevel) {
   digitalWrite(pBusPin, LOW);
   delayMicroseconds(PULLDOWN_TIME);
   if(logicLevel){
-    pinMode(pBusPin, INPUT_PULLUP);
+    pinMode(pBusPin, INPUT);
   }
   delayMicroseconds(MIN_SLOT_SIZE);
   if(!logicLevel){
-    pinMode(pBusPin, INPUT_PULLUP);
+    pinMode(pBusPin, INPUT);
   }
 }
 
@@ -109,7 +109,7 @@ boolean readBus(int pBusPin) {
   pinMode(pBusPin, OUTPUT);
   digitalWrite(pBusPin, LOW);
   delayMicroseconds(PULLDOWN_TIME);
-  pinMode(pBusPin, INPUT_PULLUP);
+  pinMode(pBusPin, INPUT);
   delayMicroseconds(READ_SAMPLE_TIME - PULLDOWN_TIME + READ_OFFSET);
   boolean input = digitalRead(pBusPin);
   delayMicroseconds(MIN_SLOT_SIZE - READ_SAMPLE_TIME -RECOVERY_BETWEEN_SLOTS); //wait for read time slot to be over (minimum 60us)
