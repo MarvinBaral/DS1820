@@ -194,10 +194,36 @@ void getTemp(int pBusPin, int indexSensor) {
 
 float convertArrayToTemp(boolean array[72]) {
   float temp = 0;
-  for (int i = 0; i < 8; i++) {
+  boolean signByteIsOk = true;
+  signed short int negativityFactor = 1;
+  
+  for (int i = 8; i < 16; i++) {
+      if (array[i] != array[8]) {
+        signByteIsOk = false;
+      }
+  }
+  //invert to negative
+  if (signByteIsOk && (array[8] == true)) {
+    negativityFactor = -1;
+    //invert
+    for (int i = 0; i < 8; i++) {
+      array[i] = !array[i];   
+    }
+    //add 1
+    for (int i = 0; i < 8; i++) {
+      if (array[i] == true) {
+        array[i] = false;
+      } else {
+        array[i] = true;
+        break;
+      }
+    }
+  }
+  
+  for (int i = 0; i < 8; i++) {  
     temp += array[i] * pow(2, (i - 1));    
   }
-  return temp;
+  return temp * negativityFactor;
 }
 
 
