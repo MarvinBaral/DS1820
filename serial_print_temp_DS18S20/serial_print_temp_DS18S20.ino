@@ -60,7 +60,12 @@ void setup() {
 
 void loop() {
   for (int i = 0; i < NUM_SENSORS; i++) {
-    getTemp(BUS_PIN, i);
+    requestTemp(BUS_PIN, i);
+  }
+  delay(TEMP_CONVERT_TIME); //wait for temperature conversion to finish
+  for (int i = 0; i < NUM_SENSORS; i++) {
+    float temp = readTemp(BUS_PIN, i);
+    printTemp(i, temp);
   }
   if (Serial.available()) {
     Serial.print("got: ");
