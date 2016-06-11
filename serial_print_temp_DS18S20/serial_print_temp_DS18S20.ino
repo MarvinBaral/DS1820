@@ -182,9 +182,6 @@ void getTemp(int pBusPin, int indexSensor) {
   float temp = convertArrayToTemp(data);
   Serial.print(indexSensor);
   Serial.print(": ");
-  if (temp > 125) { //default value if only the high bus is read instead of sensor-data
-    Serial.print("error, unrealistic high value: ");
-  }
   Serial.println(temp);
 }
 
