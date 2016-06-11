@@ -154,12 +154,10 @@ void readData(int pBusPin, const int numBits) {
 
 void getTempSingle(int pBusPin) {
   reset(BUS_PIN);
-  delayMicroseconds(100);
   writeCommand(BUS_PIN, SKIP_ROM);
   writeCommand(BUS_PIN, CONVERT_T);
   delay(TEMP_CONVERT_TIME); //wait for temperature conversion to finish
   reset(BUS_PIN);
-  delayMicroseconds(100);
   writeCommand(BUS_PIN, SKIP_ROM);
   writeCommand(BUS_PIN, READ_SCRATCHPAD);
   delayMicroseconds(5);
@@ -170,13 +168,11 @@ void getTempSingle(int pBusPin) {
 
 void getTemp(int pBusPin, int indexSensor) {
   reset(pBusPin);
-  delayMicroseconds(100);
   writeCommand(pBusPin, MATCH_ROM);
   writeData(pBusPin, 64, ROM_CODES[indexSensor]);
   writeCommand(BUS_PIN, CONVERT_T);
   delay(TEMP_CONVERT_TIME); //wait for temperature conversion to finish
   reset(BUS_PIN);
-  delayMicroseconds(100);
   writeCommand(pBusPin, MATCH_ROM);
   writeData(pBusPin, 64, ROM_CODES[indexSensor]);
   writeCommand(BUS_PIN, READ_SCRATCHPAD);
