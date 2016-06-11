@@ -82,7 +82,7 @@ boolean reset(int pBusPin) { //can even be executed multiple times directly afte
   pinMode(pBusPin, INPUT);
   startMicros = micros();
   delayMicroseconds(RESET_MAX_DELAY_SENSOR); //In this time there is a peak when master releases bus and after this sensor pulls bus down
-  do{
+  do {
     input = digitalRead(pBusPin);
     timeMicros = micros() - startMicros;
   } while(!input || timeMicros > MIN_TIME_MASTER_RESET_SAMPLING);
@@ -94,6 +94,11 @@ boolean reset(int pBusPin) { //can even be executed multiple times directly afte
     Serial.print(timeMicros);
     Serial.println(" us");
   }
+  do {
+    timeMicros = micros() - startMicros;
+    //wait until reset pulse is over
+  } while(timeMicros < MIN_TIME_MASTER_RESET_SAMPLING);
+  
   return success;
 }
 
