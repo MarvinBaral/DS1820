@@ -167,11 +167,20 @@ void getTempSingle(int pBusPin) {
 }
 
 void getTemp(int pBusPin, int indexSensor) {
+  requestTemp(pBusPin, indexSensor);
+  delay(TEMP_CONVERT_TIME); //wait for temperature conversion to finish
+  float temp = readTemp(pBusPin, indexSensor);
+  printTemp(indexSensor, temp);
+}
+
+void requestTemp(int pBusPin, int indexSensor) {
   reset(pBusPin);
   writeCommand(pBusPin, MATCH_ROM);
   writeData(pBusPin, 64, ROM_CODES[indexSensor]);
   writeCommand(BUS_PIN, CONVERT_T);
-  delay(TEMP_CONVERT_TIME); //wait for temperature conversion to finish
+}
+
+float readTemp(int pBusPin, int indexSensor) {
   reset(BUS_PIN);
   writeCommand(pBusPin, MATCH_ROM);
   writeData(pBusPin, 64, ROM_CODES[indexSensor]);
@@ -179,7 +188,10 @@ void getTemp(int pBusPin, int indexSensor) {
   delayMicroseconds(5);
   readData(BUS_PIN, READ_BYTES_FOR_TEMP);
   reset(BUS_PIN); //suppress sending of further unnecessary information
-  float temp = convertArrayToTemp(data);
+  return convertArrayToTemp(data);  
+}
+
+void printTemp(int indexSensor, float temp) {
   Serial.print(indexSensor);
   Serial.print(": ");
   Serial.println(temp);
