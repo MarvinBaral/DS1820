@@ -14,7 +14,9 @@ void loop() {
   delay(TEMP_CONVERT_TIME); //wait for temperature conversion to finish
   for (int i = 0; i < NUM_SENSORS; i++) {
     float temp = readTemp(BUS_PIN, i);
-    printTemp(i, temp);
+    if (temp != -0.5) {  //with the raid polling some values go to -0.5 for short time
+      printTemp(i, temp);
+    }
   }
   if (Serial.available()) {
     Serial.print("got: ");
