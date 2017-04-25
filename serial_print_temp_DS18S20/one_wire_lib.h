@@ -36,11 +36,11 @@ const int READ_BYTES_FOR_TEMP = 16;
 
 //==========================================================================
 
-void writeCommand(int pBusPin, const bool pCommand[8]);
 bool reset(int pBusPin);
 void writeBus(int pBusPin, bool logicLevel);
 bool readBus(int pBusPin);
 void printROMSingle(int pBusPin, bool toPasteIntoROMCodes_h);
+void writeCommand(int pBusPin, const bool pCommand[8]);
 void writeData(int pBusPin, const int numBits, const bool pData[]);
 void readData(int pBusPin, const int numBits);
 void getTempSingle(int pBusPin);
@@ -51,4 +51,3 @@ void printTemp(int indexSensor, float temp);
 float convertArrayToTemp(bool array[72]);
 
 #endif
-
